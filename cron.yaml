@@ -1,0 +1,5 @@
+cron:
+- description: daily summary job
+  url: /capture
+  schedule: every 1 hours
+
