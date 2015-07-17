@@ -5,9 +5,11 @@ import time
 from google.appengine.ext import db
 
 class LastRecord(db.Model):
+    appid = db.StringProperty()
     value = db.IntegerProperty()
 
 class Record(db.Model):
+    appid = db.StringProperty()
     value = db.IntegerProperty(required = True)
     timestamp = db.IntegerProperty(required = True)
 
@@ -44,9 +46,23 @@ def capture():
         return 'Not updated'
     lastValue.value = rank
     db.put(lastValue)
-    record = Record(value = rank, timestamp = int(time.time()))
+    record = Record(value = rank, timestamp = int(time.time()), appid = 'codeabbey')
     record.put()
     return 'New value: ' + str(rank)
+
+@app.route('/update-records')
+def updateRecords():
+    q = db.GqlQuery('SELECT * FROM Record')
+    q.fetch(limit = 30)
+    for e in q:
+        e.appid = 'codeabbey'
+        e.put()
+    q = db.GqlQuery('SELECT * FROM LastRecord')
+    q.fetch(limit = 30)
+    for e in q:
+        e.appid = 'codeabbey'
+        e.put()
+    return 'Successfully updated'
 
 @app.errorhandler(404)
 def page_not_found(e):
