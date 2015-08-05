@@ -22,12 +22,25 @@ def index():
 
 @app.route('/list')
 def records():
-    q = db.GqlQuery('SELECT * FROM Record ORDER BY timestamp DESC LIMIT 30')
-    q.fetch(limit = 30)
-    res = []
-    for e in q:
-        res.append(str(e.timestamp) + ':' + str(e.value))
-    return ' '.join(res)
+    try:
+        limit = int(flask.request.args['points'])
+    except:
+        limit = 30
+    dummy_data = '1438740841:447050 1438708441:447380 1438409640:450395 1438323240:446102' \
+            + ' 1438233243:449181 1438146840:466935 1438060442:468417 1437966842:463188' \
+            + ' 1437887641:463264 1437808443:463211 1437718440:453469 1437635640:451887' \
+            + ' 1437549242:450392 1437455641:450314 1437362041:448258 1437286442:440935' \
+            + ' 1437218040:435965 1437135244:457139 1437034444:455177 1437016387:451144'
+    if 'localhost' in flask.request.url_root:
+        res = dummy_data.split(' ')
+        res = res[:limit]
+    else:
+        q = db.GqlQuery('SELECT * FROM Record ORDER BY timestamp DESC LIMIT ' + str(limit))
+        q.fetch(limit = 30)
+        res = []
+        for e in q:
+            res.append(str(e.timestamp) + ':' + str(e.value))
+    return flask.Response(' '.join(res), mimetype = 'text/plain')
 
 @app.route('/capture')
 def capture():

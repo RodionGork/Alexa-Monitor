@@ -1,20 +1,27 @@
 $(function() {
-    
-    $.get("./list", '', onData, 'text');
+    var limit = location.href.match(/points\=(\d+)/);
+    if (limit != null) {
+        limit = parseInt(limit[1]);
+    }
+    $.get("./list" + (limit ? '?points=' + limit : ''), '', onData, 'text');
     
     function onData(data) {
         data = data.split(' ');
-        var ts = [];
+        var maxTs = parseInt(data[0].replace(/\:.+/, ''));
         var points = []
         for (var i = data.length - 1; i >= 0; i--) {
             var pts = data[i].split(':');
-            ts.push('x-' + i);
-            points.push(-parseInt(pts[1]));
+            points.push({
+                x: (pts[0] - maxTs) / 86400,
+                y: -parseInt(pts[1])}
+            );
         }
         data = {
-            labels: ts,
             series: [points]
         };
-        new Chartist.Line('#my-chart', data);
+        var opt = {
+            axisX: {type: Chartist.AutoScaleAxis, onlyInteger: true},
+            axisY: {type: Chartist.AutoScaleAxis}};
+        new Chartist.Line('#my-chart', data, opt);
     }
 });
