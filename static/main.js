@@ -20,6 +20,7 @@ $(function() {
             series: [points]
         };
         var opt = {
+            lineSmooth: Chartist.Interpolation.none(),
             axisX: {type: Chartist.AutoScaleAxis, onlyInteger: true},
             axisY: {type: Chartist.AutoScaleAxis}};
         new Chartist.Line('#my-chart', data, opt);
